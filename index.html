@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COD3HEC — Programming Languages Explained in 10 Minutes</title>
+<style>
+:root{--bg:#fbf8f1;--ink:#2b2d33;--mute:#8a8d96;--blue:#cfe3ff;--lav:#e1dcff;--mint:#cdf2e1;--coral:#ffd5cc;--yel:#fff0b8;--acc:#7c6cf0}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;height:100vh;overflow:hidden}
+#home{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;background:radial-gradient(circle at 20% 20%,var(--lav),transparent 40%),radial-gradient(circle at 85% 80%,var(--mint),transparent 40%)}
+#home h1{font-size:clamp(48px,10vw,120px);letter-spacing:-3px}
+#home h2{font-weight:400;font-size:clamp(18px,3vw,30px)}
+.btn{font:600 15px system-ui,sans-serif;border:0;border-radius:999px;padding:10px 18px;background:var(--ink);color:#fff;cursor:pointer}
+.btn.l{background:#fff;color:var(--ink);box-shadow:0 2px 8px #0002}
+#pres{display:none;height:100%;flex-direction:column}
+#stage{flex:0 0 80%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:background .6s}
+#strip{padding:14px 28px;font-size:clamp(16px,2vw,26px);text-align:center;background:#fff;border-top:1px solid #0001;min-height:64px;display:flex;align-items:center;justify-content:center}
+#bar{height:5px;background:#0001}#bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .4s}
+#ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:8px;font-family:system-ui}
+#ctl.h{display:none}
+.tag{position:absolute;top:14px;left:20px;font:600 13px system-ui;letter-spacing:2px;color:var(--mute)}
+.big{font-size:clamp(40px,8vw,110px);font-weight:700;letter-spacing:-2px}
+.sub{font:500 clamp(14px,2vw,24px) system-ui;color:var(--mute);margin-top:8px}
+.chip{position:absolute;padding:12px 22px;border-radius:18px;font:700 clamp(18px,3vw,34px) system-ui;box-shadow:0 8px 24px #0002;animation:fly 1s cubic-bezier(.2,1.3,.4,1) both;animation-delay:var(--d,0s)}
+@keyframes fly{from{transform:translate(var(--fx),var(--fy)) rotate(40deg) scale(.2);opacity:0}to{transform:translate(var(--tx,0),var(--ty,0)) rotate(0) scale(1);opacity:1}}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes wob{50%{transform:rotate(8deg) scale(1.08)}}
+@keyframes grow{from{width:0}}
+@keyframes rise{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.pop{animation:pop .7s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--d,0s)}
+.rise{animation:rise .7s both;animation-delay:var(--d,0s)}
+.row{display:flex;gap:clamp(12px,3vw,40px);align-items:center;justify-content:center;flex-wrap:wrap}
+.card{background:#fff;border-radius:22px;padding:22px 28px;box-shadow:0 10px 30px #0002;text-align:center;font:600 clamp(15px,2vw,24px) system-ui}
+.code{background:#22252d;color:#e8e8ee;border-radius:16px;padding:20px 26px;font:clamp(14px,2vw,24px)/1.6 Consolas,monospace;min-width:min(520px,90%);box-shadow:0 14px 40px #0004;text-align:left}
+.code .o{color:#7ee2a8;margin-top:10px;display:block}
+.code input{background:#343842;color:#ffd479;border:0;border-radius:6px;padding:2px 8px;font:inherit;width:7ch}
+.tl{width:70%;height:6px;background:#0002;border-radius:3px;position:relative;margin:70px 0 20px}
+.tl b{position:absolute;top:-70px;right:0;animation:pop .8s .9s both;font:700 clamp(36px,7vw,90px) system-ui}
+.tl i{display:block;height:100%;background:var(--acc);animation:grow 1s both;border-radius:3px}
+.cat{font-size:clamp(70px,14vw,180px);animation:wob 1.2s infinite}
+.orb{position:absolute;width:min(60vw,60vh);height:min(60vw,60vh);animation:orbit 14s linear infinite}
+.orb span{position:absolute;padding:6px 14px;border-radius:14px;font:700 18px system-ui;left:50%;top:0;transform-origin:0 min(30vw,30vh)}
+.bar2{height:26px;border-radius:13px;animation:grow 1.4s both;margin:8px 0;color:#fff;font:600 14px system-ui;padding:3px 12px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important}}
+@media (max-width:700px){#stage{flex-basis:70%}}
+</style></head><body>
+
+<div id="home">
+ <div class="sub">CREATED BY ENAYAT</div>
+ <h1>COD3HEC</h1>
+ <h2>Programming Languages Explained in 10 Minutes</h2>
+ <div class="row"><button class="btn" id="go">Enter Presenter Mode</button></div>
+ <div class="sub" id="hcount"></div>
+</div>
+
+<div id="pres">
+ <div id="stage"><div class="tag" id="tag"></div><div id="scene" class="row" style="flex-direction:column;width:100%"></div></div>
+ <div id="bar"><i id="prog"></i></div>
+ <div id="strip"></div>
+ <div id="ctl">
+  <button class="btn l" data-a="prev">◀ Prev</button>
+  <button class="btn" data-a="next">Next ▶</button>
+  <button class="btn l" data-a="play">Play / Pause</button>
+  <button class="btn l" data-a="replay">Replay (R)</button>
+  <button class="btn l" data-a="mode" id="mode">Mode: Manual</button>
+  <button class="btn l" data-a="sec">Restart section</button>
+  <button class="btn l" data-a="fs">Fullscreen (F)</button>
+  <button class="btn l" data-a="hide">Hide (H)</button>
+  <button class="btn l" data-a="exit">Exit</button>
+ </div>
+</div>
+
+<script>
+const COL={Hook:'#f3f0ff',Python:'#eef5ff'};
+/* ============ SCENE LIBRARY (reusable, parameterised) ============ */
+const R=(a,b)=>a+Math.random()*(b-a);
+const FROM=[[-900,0],[900,0],[0,-600],[0,600],[-700,-500],[700,500]];
+function chips(list,o={}){ // language chips flying in from different directions
+  return list.map(([t,c],i)=>{const f=FROM[i%6],p=o.pos?o.pos[i]:[R(-260,260),R(-120,120)];
+   return `<div class="chip" style="background:${c};--fx:${f[0]}px;--fy:${f[1]}px;--tx:${p[0]}px;--ty:${p[1]}px;--d:${i*.15}s">${t}</div>`}).join('');
+}
+const title=(t,s,c)=>`<div class="pop big" style="color:${c}">${t}</div><div class="sub rise" style="--d:.5s">${s||''}</div>`;
+const timeline=(y,l,n,c)=>`<div class="sub">${l}</div><div class="tl"><i style="background:${c}"></i><b style="color:${c}">${y}</b></div><div class="card pop" style="--d:1.2s">${n}</div>`;
+const cards=(arr)=>`<div class="row">${arr.map((a,i)=>`<div class="card pop" style="--d:${i*.4}s;background:${a[1]}">${a[0]}</div>`).join('')}</div>`;
+function code(lines,out,color){ // typed code window with output
+  const L=lines.map((l,i)=>`<div class="rise" style="--d:${i*.5}s">${l}</div>`).join('');
+  return `<div class="code" style="border-top:6px solid ${color||'#7c6cf0'}">${L}<span class="o rise" style="--d:${lines.length*.5+.3}s">${out}</span></div>`;
+}
+/* Interactive Python experiment (simulation — not a real Python interpreter) */
+function pyLab(){
+  return `<div class="code" style="border-top:6px solid #3776ab"><div>name = "<input id="pn" value="Enayat">"</div><div>print("Hello,", name)</div>
+  <button class="btn" style="margin-top:12px" onclick="pyRun()">▶ Run (simulated)</button><span class="o" id="po"></span></div><div class="sub">Simulation: output is produced locally, no Python is running.</div>`;
+}
+function pyRun(){const v=document.getElementById('pn').value.replace(/[<>&]/g,'');document.getElementById('po').textContent='Hello, '+v}
+function dataPipe(){ // messy -> table -> chart
+  return `<div class="row"><div class="card pop" style="background:var(--coral)">🌀 messy data<br>3,,x,17,NaN</div><div class="big pop" style="--d:.6s">→</div>
+  <div class="card pop" style="--d:1s;background:var(--mint)">clean table<br>3 · 8 · 17</div><div class="big pop" style="--d:1.6s">→</div>
+  <div class="card pop" style="--d:2s;background:#fff"><div class="bar2" style="width:60px;background:#3776ab;--d:2.2s"></div><div class="bar2" style="width:120px;background:#f59e0b"></div><div class="bar2" style="width:90px;background:#3776ab"></div></div></div>`;
+}
+function neural(){
+  const L=[3,4,2],xs=[80,260,440];let s='<svg viewBox="0 0 520 280" width="min(640px,90%)">';
+  L.forEach((n,i)=>{for(let a=0;a<n;a++)(L[i+1]?[...Array(L[i+1]).keys()]:[]).forEach(b=>{s+=`<line x1="${xs[i]}" y1="${40+a*(200/(n-1||1))}" x2="${xs[i+1]}" y2="${40+b*(200/(L[i+1]-1||1))}" stroke="#3776ab55" stroke-width="2"/>`})});
+  L.forEach((n,i)=>{for(let a=0;a<n;a++)s+=`<circle class="pop" style="--d:${i*.4}s;transform-origin:${xs[i]}px ${40+a*(200/(n-1||1))}px" cx="${xs[i]}" cy="${40+a*(200/(n-1||1))}" r="16" fill="${i==2?'#f59e0b':'#3776ab'}"/>`});
+  s+=`<circle r="7" fill="#f59e0b"><animateMotion dur="2s" repeatCount="indefinite" path="M80 40 L260 120 L440 80"/></circle></svg>`;
+  return s+`<div class="sub">data in → hidden layers → prediction out</div>`;
+}
+function speed(){
+  return `<div style="width:min(620px,88%)"><div class="sub">Execution time (conceptual, not a benchmark)</div>
+  <div class="bar2" style="width:90%;background:#3776ab">Python — runs slower</div><div class="bar2" style="width:30%;background:#7c6cf0">C++ — runs faster</div>
+  <div class="sub" style="margin-top:20px">Developer time</div>
+  <div class="bar2" style="width:30%;background:#3776ab;--d:1s">Python — quick to write</div><div class="bar2" style="width:90%;background:#7c6cf0;--d:1s">C++ — takes longer</div></div>`;
+}
+function monty(){
+  return `<div class="row"><div class="cat" style="animation-name:wob">🐍</div><div class="big pop" style="--d:1.2s">✖</div><div class="cat pop" style="--d:2s">🎭</div></div>
+  <div class="big rise" style="--d:2.6s;color:#f59e0b">MONTY PYTHON</div><div class="sub">the comedy show, not the snake</div>`;
+}
+function universe(){
+  const n=[['Python','#cfe3ff'],['Java','#ffd5cc'],['C++','#e1dcff'],['JS','#fff0b8'],['Rust','#ffe0c2'],['Go','#cdf2e1'],['C#','#ece1ff'],['PHP','#f6d6ee']];
+  return `<div class="orb">${n.map((x,i)=>`<span style="background:${x[1]};transform:rotate(${i*45}deg) translateX(-50%)">${x[0]}</span>`).join('')}</div><div class="big pop" style="position:relative">🌌</div><div class="sub" style="position:relative">the programming-language universe</div>`;
+}
+const q=`<div class="big pop" style="font-size:clamp(120px,28vw,320px);color:#7c6cf0;animation-name:pop,wob;animation-duration:.7s,2s;animation-iteration-count:1,infinite">?</div>`;
+
+/* ============ STORYBOARD (data-driven) ============
+   [section, exact narration, auto-duration ms, scene HTML builder] */
+const HOOK='Hook',PY='Python';
+const B=[
+[HOOK,'Python, Java, C++, JavaScript, Rust, Go...',5000,()=>chips([['Python','#cfe3ff'],['Java','#ffd5cc'],['C++','#e1dcff'],['JavaScript','#fff0b8'],['Rust','#ffe0c2'],['Go','#cdf2e1']])],
+[HOOK,'Bhai, programming seekhne jaoge toh itni saari languages dekhkar ek hi question aata hai — aakhir seekhein toh seekhein kya?',6000,()=>q+`<div class="sub rise" style="--d:.6s">aakhir seekhein toh seekhein kya?</div>`],
+[HOOK,'Kya Python se AI banta hai? Java se apps? C++ se games?',6000,()=>cards([['🤖 AI<br>Python?','var(--blue)'],['📱 Apps<br>Java?','var(--coral)'],['🎮 Games<br>C++?','var(--lav)']])],
+[HOOK,'Aur JavaScript ka Java se koi connection bhi hai ya dono bas naam ke bhai hain?',6000,()=>`<div class="row"><div class="card pop" style="background:var(--coral)">☕ Java<br><small>name tag: Ja…</small></div><div class="big pop" style="--d:.6s">=?</div><div class="card pop" style="--d:.3s;background:var(--yel)">✨ JavaScript<br><small>name tag: Ja…</small></div></div><div class="sub">same-looking names… brothers?</div>`],
+[HOOK,'Aur sabse interesting baat — kuch languages computer ko super-fast instructions deti hain, kuch websites chalati hain, aur kuch AI development mein use hoti hain.',7000,()=>cards([['⚡ CPU instructions<br><code>01101001</code>','var(--lav)'],['🌐 Interactive websites','var(--yel)'],['🧠 AI visuals','var(--mint)']])],
+[HOOK,'Toh aaj hum programming languages ko boring definitions se nahi, balki unki stories, real-world uses aur interesting facts ke through samjhenge.',7000,()=>cards([['📖 Stories','var(--coral)'],['🌍 Real-world uses','var(--blue)'],['💡 Interesting facts','var(--yel)']])],
+[HOOK,'Video ke end tak tumhe clear ho jayega ki kaunsi language kis kaam ke liye bani hai. Chalo shuru karte hain!',6000,universe],
+
+[PY,'Sabse pehle Python.',4000,()=>title('Python','The Friendly Toolkit','#3776ab')],
+[PY,'Agar tumne kabhi programming seekhne ka socha hai, toh kisi na kisi ne zaroor kaha hoga — Python se start karo.',6000,()=>`<div class="row"><div class="card pop">🧑‍🎓 "Programming seekhni hai?"</div><div class="card pop" style="--d:.8s;background:var(--yel)">🗣️ "Python se start karo."</div></div>`],
+[PY,'Python ko 1991 mein Guido van Rossum ne introduce kiya tha. Unka main goal tha programming ko simple aur readable banana.',7000,()=>timeline('1991','Introduced by Guido van Rossum','Goal: simple &amp; readable','#3776ab')],
+[PY,'Baaki languages mein kabhi curly braces, semicolons aur itne symbols hote hain ki lagta hai keyboard par billi dance karke gayi hai.',7000,()=>`<div class="cat">🐈</div><div class="card pop" style="--d:.5s">{ } ; ( ) [ ] ; { } ;;; &lt;&gt;</div><div class="sub">the cat walked on the keyboard</div>`],
+[PY,'Lekin Python ka code comparatively simple dikhta hai.',5000,()=>code(['name = "COD3HEC"','print("Hello,", name)'],'Hello, COD3HEC','#3776ab')],
+[PY,'Python ki sabse badi strength hai uski libraries.',5000,()=>`<div class="big pop">🧰</div>`+cards([['pandas','var(--blue)'],['NumPy','var(--mint)'],['PyTorch','var(--coral)'],['Django','var(--yel)']])],
+[PY,'Library ko simple language mein samjho — kisi ne pehle se ek toolkit bana di hai, ab tumhe har cheez zero se nahi banani.',7000,()=>`<div class="row"><div class="card pop" style="background:var(--coral)">❌ zero se banana</div><div class="big pop" style="--d:.5s">→</div><div class="card pop" style="--d:.9s;background:var(--mint)">✅ ready toolkit use karo</div></div>`],
+[PY,'Data analysis karna hai? Pandas aur NumPy.',5000,dataPipe],
+[PY,'AI aur Machine Learning? PyTorch aur TensorFlow.',5000,neural],
+[PY,'Websites banani hain? Django aur Flask.',5000,()=>`<div class="card" style="width:min(520px,85%)">🌐 blank browser</div><div class="row"><div class="card pop" style="background:var(--mint)">Django path</div><div class="card pop" style="--d:.4s;background:var(--blue)">Flask path</div></div><div class="card pop" style="--d:1s">✅ working website</div>`],
+[PY,'Netflix jaise platforms, Instagram aur scientific research mein bhi Python ka use hota hai.',6000,()=>cards([['🎬 Netflix-style platforms','var(--coral)'],['📷 Instagram','var(--lav)'],['🔬 Scientific research','var(--mint)']])],
+[PY,'Haan, ek weakness bhi hai. Python generally C++ jaisi languages ke comparison mein slow ho sakti hai.',6000,speed],
+[PY,'Lekin iska code likhna fast hai. Matlab execution mein thoda time lag sakta hai, lekin developer ka time bach jata hai.',7000,()=>pyLab()],
+[PY,'Aur ek interesting fact — Python ka naam snake se nahi, comedy show Monty Python se inspired tha!',7000,monty],
+];
+
+/* ===== JAVASCRIPT + TYPESCRIPT (stage 3b) ===== */
+const JS='JavaScript',TS='TypeScript',Y='#e8b800',TB='#2f74c0';
+COL.JavaScript='#fffbe0';COL.TypeScript='#e8f2ff';
+let jsN=0;
+function jsLab(){
+  return `<div class="card" style="width:min(560px,92%);text-align:left;background:#fff"><div class="sub" style="margin:0 0 10px">🌐 browser window (educational simulation)</div>
+  <div class="row" style="justify-content:flex-start"><button class="btn" style="background:${Y};color:#222" onclick="jsMenu()">☰ Menu</button>
+  <button class="btn" onclick="jsCount()">Clicks: <span id="jc">${jsN}</span></button></div>
+  <div id="jm" class="rise" style="display:none;margin:10px 0;background:var(--yel);padding:10px;border-radius:12px">Home · About · Contact</div>
+  <div style="margin-top:12px"><input id="je" placeholder="your email" style="padding:8px;border-radius:8px;border:1px solid #0003"> <button class="btn l" onclick="jsForm()">Submit</button></div><div id="jr" class="sub"></div></div>`;
+}
+function jsMenu(){const m=document.getElementById('jm');m.style.display=m.style.display=='none'?'block':'none'}
+function jsCount(){document.getElementById('jc').textContent=++jsN}
+function jsForm(){const v=document.getElementById('je').value,r=document.getElementById('jr');
+  r.textContent=/^\S+@\S+\.\S+$/.test(v)?'✅ Looks good!':'⚠️ Oops — JavaScript caught a mistake: email is invalid';}
+const layers=()=>`<div class="row"><div class="card pop" style="background:var(--coral)">🦴 HTML<br><small>structure</small></div><div class="card pop" style="--d:.7s;background:var(--blue)">👕 CSS<br><small>design</small></div><div class="card pop" style="--d:1.4s;background:var(--yel)">⚡ JavaScript<br><small>functionality</small></div></div>`;
+function tsLab(){
+  return `<div class="code" style="border-top:6px solid ${TB}"><div>let age<span style="color:#7fc1ff">: number</span> = <input id="tv" value="21" oninput="tsCheck()" style="width:9ch"></div>
+  <span class="o" id="to">✅ OK — number</span></div><div class="sub">Educational simulation: a tiny type-check, not the real TypeScript compiler.</div>`;
+}
+function tsCheck(){const v=document.getElementById('tv').value.trim(),o=document.getElementById('to');
+  const ok=v!==''&&!isNaN(Number(v));o.style.color=ok?'#7ee2a8':'#ff8f80';
+  o.textContent=ok?'✅ OK — number':`⚠️ Type 'string' is not assignable to type 'number'`;}
+const tsCmp=()=>`<div class="row" style="align-items:stretch"><div class="code" style="min-width:0;border-top:6px solid ${Y}"><b>JavaScript</b><div>let age = 21;</div><div>age = "twenty";</div><span class="o" style="color:#ffd479">…runs. problem shows up later 😬</span></div>
+  <div class="code" style="min-width:0;border-top:6px solid ${TB}"><b>TypeScript</b><div>let age<span style="color:#7fc1ff">: number</span> = 21;</div><div>age = "twenty";</div><span class="o" style="color:#ff8f80">⚠️ type error, caught early</span></div></div>`;
+const tsSpell=()=>`<div class="code" style="border-top:6px solid ${TB}"><div>let age: number = <span style="text-decoration:wavy underline #ff6b5a">"twenty"</span></div></div><div class="card pop" style="--d:.8s;background:var(--coral)">📝 like a spell-checker for code</div>`;
+const tsJs=()=>`<div class="row"><div class="code" style="min-width:0">let age<span style="color:#7fc1ff">: number</span> = 21;</div><div class="big pop" style="--d:.6s">→</div><div class="code" style="min-width:0;--d:1s" ><div class="rise" style="--d:1s">let age = 21;</div></div></div><div class="sub rise" style="--d:1.4s">types vanish · plain JavaScript runs in browser / runtime</div>`;
+B.push(
+[JS,'Ab baat karte hain JavaScript ki.',4000,()=>title('JavaScript','The Living Website',Y)],
+[JS,'Agar Python AI ki duniya mein popular hai, toh JavaScript web development ki duniya ka superstar hai.',6000,()=>`<div class="row"><div class="card pop" style="background:var(--blue)">🐍 Python<br>AI world</div><div class="card pop" style="--d:.6s;background:var(--yel)">⭐ JavaScript<br>web superstar</div></div>`],
+[JS,'Tum kisi website par jaate ho, button click karte ho, menu open hota hai, form tumhari mistake pakad leta hai — in sab interactions mein JavaScript ka important role hota hai.',9000,jsLab],
+[JS,'HTML website ka structure banata hai, CSS usko design karta hai, aur JavaScript usmein functionality add karta hai.',7000,layers],
+[JS,'Iski origin story bhi interesting hai.',4000,()=>`<div class="big pop">📜</div><div class="sub">origin story</div>`],
+[JS,'1995 mein Netscape ko browser ke liye ek scripting language chahiye thi. Brendan Eich ne bahut kam time mein iska initial version develop kiya — lagbhag 10 din mein!',9000,()=>timeline('1995','Netscape needed a browser scripting language','Brendan Eich · ~10 days ⏳',Y)],
+[JS,'Aur nahi, JavaScript aur Java same language nahi hain.',5000,()=>`<div class="row"><div class="card pop" style="background:var(--coral)">☕ Java</div><div class="big pop" style="--d:.5s;color:#e0483a">≠</div><div class="card pop" style="--d:.3s;background:var(--yel)">✨ JavaScript</div></div>`],
+[JS,'Naam similar hai, lekin dono alag languages hain. JavaScript ka naam us time Java ki popularity ka benefit lene ke liye rakha gaya tha.',8000,()=>`<div class="row"><div class="card pop" style="background:var(--coral)">☕ Java world</div><div class="card pop" style="--d:.5s;background:var(--yel)">🌐 JavaScript world</div></div><div class="big rise" style="--d:1s;font-size:clamp(24px,4vw,48px)">Similar names. Different languages.</div>`],
+[JS,'JavaScript ki flexibility powerful hai, lekin bade projects mein code ko manage karna kabhi-kabhi difficult ho sakta hai.',7000,()=>`<div class="row">${['app.js','cart.js','user.js','api.js','utils.js','misc.js','old.js','new2.js'].map((f,i)=>`<div class="chip" style="position:static;background:var(--yel);--fx:${R(-400,400)}px;--fy:${R(-300,300)}px;--d:${i*.2}s;font-size:18px">${f}</div>`).join('')}</div><div class="sub rise" style="--d:2s">project grows… so does the tangle 🍝</div>`],
+[JS,'Aur isi problem ko solve karne ke liye aayi...',4000,()=>`<div class="big pop" style="color:${TB}">…TypeScript</div>`],
+[TS,'TypeScript ko samjho JavaScript ka disciplined version.',5000,()=>title('TypeScript','The Code Spell-Checker',TB)],
+[TS,'Microsoft ne ise 2012 mein introduce kiya.',5000,()=>timeline('2012','Introduced by Microsoft','TypeScript',TB)],
+[TS,'JavaScript mein tum kabhi galti se number aur text ko mix kar sakte ho. Kuch cases mein error turant nahi dikhta aur problem baad mein saamne aati hai.',8000,()=>code(['let price = 100;','price = "hundred";','console.log(price * 2);'],'NaN  ← silent problem, found later',Y)],
+[TS,'TypeScript types add karta hai.',4000,()=>code(['let price<span style="color:#7fc1ff">: number</span> = 100;','let name<span style="color:#7fc1ff">: string</span> = "Enayat";'],'types added ✔',TB)],
+[TS,'Jaise tum computer ko pehle hi bata dete ho ki ye variable number hai aur ye text.',6000,tsCmp],
+[TS,'Agar tum galat type ka data use karne ki koshish karoge, toh TypeScript development ke time warning de sakta hai.',8000,tsLab],
+[TS,'Ye kuch-kuch code ke liye spell-checker jaisa hai.',5000,tsSpell],
+[TS,'Aur interesting baat — TypeScript ultimately JavaScript mein convert hota hai, jise browser ya JavaScript runtime execute kar sakta hai.',8000,tsJs],
+[TS,'Isliye bade web projects mein TypeScript kaafi useful hai.',5000,()=>cards([['🏗️ Big web projects','var(--blue)'],['🛡️ Fewer surprises','var(--mint)']])]
+);
+
+/* ===== PYTHON FIX + JAVA + C ===== */
+(()=>{const k=B.findIndex(b=>b[1].startsWith('Lekin iska code likhna fast hai'));
+ B.splice(k,0,[PY,B[k][1],7000,()=>`<div class="sub">Execution: a little slower ⏱️ · Developer time: saved 🕒</div><div class="row"><div class="card pop" style="background:var(--blue)">✍️ Python: 5 min to write<br>⏱️ 3 s to run</div><div class="card pop" style="--d:.6s;background:var(--lav)">✍️ C++: 40 min to write<br>⏱️ 0.2 s to run</div></div><div class="card pop" style="--d:1.4s;background:var(--mint)">Developer time saved ✅</div>`]);})();
+const JV='Java',CC='C',OR='#e8710a',NB='#1f4e9c';
+COL.Java='#fff2e6';COL.C='#e9eefb';
+function javaPipe(os){
+  const st=[['☕ Source','Hello.java'],['⚙️ Compiler','javac'],['📦 Bytecode','Hello.class'],['🧠 JVM','runs bytecode']];
+  const S=st.map((s,i)=>`<div class="card pop" style="--d:${i*.7}s;border-top:5px solid ${OR}">${s[0]}<br><small>${s[1]}</small></div>${i<3?`<div class="pop" style="--d:${i*.7+.4}s;font-size:28px">→</div>`:''}`).join('');
+  const O=os?`<div class="row">${['🪟 Windows','🍎 macOS','🐧 Linux'].map((o,i)=>`<div class="card pop" style="--d:${3+i*.5}s;background:var(--mint)">${o}<br><small>same bytecode ✔</small></div>`).join('')}</div>`:'';
+  return `<div class="row">${S}</div>${O}<button class="btn" onclick="show(i)">▶ Run pipeline (simulation)</button>`;
+}
+const verbose=()=>`<div class="row" style="align-items:flex-start"><div class="code" style="min-width:0;border-top:6px solid ${OR}"><div>public class Hello {</div><div>&nbsp;public static void main(String[] a) {</div><div>&nbsp;&nbsp;System.out.println("Hi");</div><div>&nbsp;}</div><div>}</div></div><div class="code pop" style="--d:1.5s;min-width:0;border-top:6px solid #3776ab"><div>print("Hi")</div></div></div><div class="sub">more code for a simple task… but very structured</div>`;
+let cm=[0,0,0,0,0,0,0,0];
+function cLab(){
+  return `<div class="row" id="cb">${cm.map((v,k)=>cBlock(k)).join('')}</div><div class="sub" id="ci">Click a block to write to memory (educational simulation)</div>`;
+}
+function cBlock(k){return `<div class="card" style="cursor:pointer;min-width:90px;border-top:5px solid ${NB}" onclick="cClick(${k})">0x${(100+k*4).toString(16)}<br><b>${cm[k]}</b></div>`}
+function cClick(k){cm[k]=(cm[k]+1)%256;document.getElementById('cb').innerHTML=cm.map((v,j)=>cBlock(j)).join('');
+  document.getElementById('ci').textContent=`*(ptr+${k}) = ${cm[k]}  — you control the address, you own the responsibility`}
+const hw=()=>`<div class="row"><div class="code pop" style="min-width:0">int x = 5;</div><div class="pop" style="--d:.5s;font-size:28px">→</div><div class="card pop" style="--d:.8s;background:var(--blue)">🔲 CPU</div><div class="pop" style="--d:1.2s;font-size:28px">→</div><div class="card pop" style="--d:1.5s;background:var(--mint)">🖥️ Operating system</div><div class="card pop" style="--d:2s;background:var(--yel)">📟 Embedded device</div></div>`;
+B.push(
+[JV,'Ab aate hain Java par.',4000,()=>title('Java','The Cross-Platform Machine',OR)],
+[JV,'Java un systems mein milti hai jo tum roz use karte ho — banking software, enterprise applications aur bahut saare business systems.',7000,()=>cards([['🏦 Banking software','var(--yel)'],['🏢 Enterprise apps','var(--coral)'],['📊 Business systems','var(--blue)']])],
+[JV,'Java 1995 mein officially release hui thi.',5000,()=>timeline('1995','Officially released','Java',OR)],
+[JV,'Iska famous concept tha — Write Once, Run Anywhere.',5000,()=>`<div class="big pop" style="color:${OR};font-size:clamp(32px,6vw,80px)">Write Once,</div><div class="big pop" style="--d:.8s;color:${OR};font-size:clamp(32px,6vw,80px)">Run Anywhere.</div>`],
+[JV,'Matlab program ek baar likho aur Java Virtual Machine ki help se alag-alag supported platforms par chala sakte ho.',8000,()=>javaPipe(false)],
+[JV,'Matlab program ek baar likho aur Java Virtual Machine ki help se alag-alag supported platforms par chala sakte ho.',9000,()=>javaPipe(true)],
+[JV,'Java ka ek drawback hai: kabhi-kabhi simple kaam ke liye bhi kaafi code likhna padta hai.',7000,verbose],
+[JV,'Lekin iska structured approach bade software projects mein useful hota hai.',5000,()=>cards([['📐 Structure','var(--lav)'],['🧱 Big projects stay organised','var(--mint)']])],
+[JV,'Android development ke early aur traditional ecosystem mein bhi Java ka bahut bada role raha hai.',6000,()=>`<div class="row"><div class="card pop" style="background:var(--mint)">🤖 Android<br>early &amp; traditional ecosystem</div><div class="card pop" style="--d:.6s;background:var(--coral)">☕ Java</div></div>`],
+[JV,'Aur Java naam? Iska connection coffee se hai. Programming ki duniya mein naam bhi kabhi-kabhi caffeine ke bharose rakhe jaate hain!',8000,()=>`<div class="cat">☕</div><div class="sub rise" style="--d:.6s">names run on caffeine too 😄</div>`],
+
+[CC,'Ab milte hain C se.',4000,()=>title('C','Inside the Computer',NB)],
+[CC,'C ko 1972 mein Dennis Ritchie ne Bell Labs mein develop kiya tha.',6000,()=>timeline('1972','Dennis Ritchie · Bell Labs','C',NB)],
+[CC,'Is language ne modern programming ki duniya par bahut gehra influence dala.',5000,()=>`<div class="card pop" style="border-top:5px solid ${NB}">C</div><div class="row">${['C++','Java','C#','Go'].map((n,i)=>`<div class="card pop" style="--d:${.5+i*.4}s;background:var(--blue)">${n}</div>`).join('')}</div><div class="sub">influence spreads</div>`],
+[CC,'Computer ke hardware ke kareeb kaam karna ho, operating systems develop karne hon ya embedded systems banane hon — C aaj bhi important hai.',8000,hw],
+[CC,'Computer ke hardware ke kareeb kaam karna ho, operating systems develop karne hon ya embedded systems banane hon — C aaj bhi important hai.',6000,()=>code(['#include &lt;stdio.h&gt;','int main() {','  printf("Hello");','}'],'→ machine code → hardware',NB)],
+[CC,'Python jaise high-level languages tumhare liye bahut saare complicated details handle kar deti hain.',6000,()=>`<div class="row"><div class="code" style="min-width:0;border-top:6px solid #3776ab">x = [1,2,3]</div><div class="card pop" style="--d:.6s;background:var(--blue)">Python hides memory details 🙈</div></div>`],
+[CC,'C mein tumhe memory aur low-level details par zyada control milta hai.',9000,cLab],
+[CC,'Iska benefit? Performance aur control.',4000,()=>cards([['⚡ Performance','var(--mint)'],['🎛️ Control','var(--blue)']])],
+[CC,'Challenge? Zyada responsibility bhi tumhari!',5000,()=>`<div class="card pop" style="background:var(--coral)">⚠️ Free the memory yourself<br>⚠️ Stay inside the bounds<br>All on you!</div>`],
+[CC,'C ka influence operating systems aur bahut saare system-level software mein aaj bhi dikhta hai.',6000,()=>cards([['🖥️ Operating systems','var(--blue)'],['🔧 System-level software','var(--lav)']])]
+);
+
+/* ===== C++ + C# ===== */
+const CP='C++',CS='C#',PU='#7c4dff',VI='#9b4de0';
+COL['C++']='#f1ecff';COL['C#']='#f6ecff';
+let gx=200,gs=0,gl=0;
+function cppGame(){
+  setTimeout(gameInit,30);
+  return `<canvas id="gc" width="480" height="300" style="background:#fff;border-radius:18px;box-shadow:0 10px 30px #0002;max-width:92%;touch-action:none"></canvas>
+  <div class="row"><button class="btn l" onmousedown="gx=Math.max(20,gx-40)">◀</button><span id="gsc" class="sub">Score 0 — catch the ⭐ (move mouse / touch / buttons)</span><button class="btn l" onclick="gx=Math.min(460,gx+40)">▶</button></div>
+  <div class="sub">Tiny 2D game in Canvas — educational demo of what C++ is used for, not a C++ program.</div>`;
+}
+function gameInit(){
+  const c=document.getElementById('gc');if(!c||!c.getContext)return;
+  const x=c.getContext('2d'),st=[];gs=0;let t=0;
+  c.onmousemove=e=>{const r=c.getBoundingClientRect();gx=(e.clientX-r.left)*480/r.width};
+  c.ontouchmove=e=>{const r=c.getBoundingClientRect();gx=(e.touches[0].clientX-r.left)*480/r.width};
+  (function loop(){
+    if(!document.body.contains(c))return;
+    t++;if(t%40==0)st.push({x:R(20,460),y:0});
+    x.clearRect(0,0,480,300);x.fillStyle=PU;x.fillRect(gx-30,270,60,14);
+    x.font='24px serif';
+    for(let k=st.length-1;k>=0;k--){const s=st[k];s.y+=2.5;x.fillText('⭐',s.x-12,s.y);
+      if(s.y>262&&Math.abs(s.x-gx)<38){st.splice(k,1);gs++;const e=document.getElementById('gsc');if(e)e.textContent='Score '+gs}
+      else if(s.y>300)st.splice(k,1)}
+    requestAnimationFrame(loop)})();
+}
+const incr=()=>`<div class="row"><div class="code" style="min-width:0;border-top:6px solid ${PU}">int x = 5;<br><span class="rise" style="--d:.8s;color:#ffd479">x++;</span></div><div class="big pop" style="--d:1.4s">→</div><div class="card pop" style="--d:1.6s;font-size:48px;color:${PU}">x = 6</div></div><div class="sub rise" style="--d:2s">C++ = "C, plus one" ➕1</div>`;
+const oop=()=>`<div class="row"><div class="card pop" style="background:var(--coral)">🧍 Player<br><small>health · move()</small></div><div class="card pop" style="--d:.4s;background:var(--yel)">👾 Enemy<br><small>speed · attack()</small></div><div class="card pop" style="--d:.8s;background:var(--mint)">🔫 Weapon<br><small>damage · fire()</small></div></div><div class="big pop" style="--d:1.3s">⬇</div><div class="card pop" style="--d:1.6s;border-top:5px solid ${PU}">🎮 Complex game = small manageable parts</div>`;
+let ux=0,uj=0;
+function unity(){
+  return `<div class="row" style="align-items:stretch"><div class="code" style="min-width:0;border-top:6px solid ${VI}"><div>void Update() {</div><div id="us">&nbsp;transform.Translate(0,0);</div><div>}</div></div>
+  <div class="card" style="width:min(300px,90%);height:170px;position:relative;background:#eef1ff"><div id="ub" style="position:absolute;left:${ux}px;bottom:${uj}px;width:36px;height:36px;background:${VI};border-radius:8px;transition:.3s"></div></div></div>
+  <div class="row"><button class="btn" onclick="uMv(40,0)">→ Move</button><button class="btn" onclick="uMv(0,60)">⤒ Jump</button><button class="btn l" onclick="uMv(-ux,-uj)">↺ Reset</button></div><div class="sub">Unity-inspired simulation — no Unity or C# is running.</div>`;
+}
+function uMv(dx,dy){ux=Math.max(0,Math.min(250,ux+dx));uj=Math.max(0,uj+dy);if(dy>0)setTimeout(()=>{uj=0;const b=document.getElementById('ub');if(b)b.style.bottom='0px'},400);
+  const b=document.getElementById('ub');if(b){b.style.left=ux+'px';b.style.bottom=uj+'px'}
+  const s=document.getElementById('us');if(s)s.innerHTML=`&nbsp;transform.Translate(${dx},${dy});`}
+B.push(
+[CP,'Agar C ek powerful foundation hai, toh C++ usi family ka ek aur powerful member hai.',6000,()=>`<div class="row"><div class="card pop" style="border-top:5px solid ${NB}">C<br><small>foundation</small></div><div class="big pop" style="--d:.5s">→</div><div class="card pop" style="--d:.9s;border-top:5px solid ${PU};font-size:34px">C++</div></div>`],
+[CP,'Bjarne Stroustrup ne 1980s mein C++ develop karna shuru kiya.',6000,()=>timeline('1980s','Bjarne Stroustrup begins C++','C++',PU)],
+[CP,'Unka aim tha C ki performance ke saath bade software ko organize karne ke better tools dena.',7000,()=>`<div class="row"><div class="card pop" style="background:var(--blue)">⚡ C performance</div><div class="big pop" style="--d:.5s">+</div><div class="card pop" style="--d:.9s;background:var(--lav)">🗂️ tools to organise big software</div></div>`],
+[CP,'C++ mein object-oriented programming jaise concepts ka use karke complex software ko manageable parts mein organize kiya ja sakta hai.',9000,oop],
+[CP,'Iska use game development, graphics engines, high-performance applications aur trading systems mein hota hai.',9000,cppGame],
+[CP,'Iska use game development, graphics engines, high-performance applications aur trading systems mein hota hai.',7000,()=>cards([['🎮 Game development','var(--lav)'],['🖼️ Graphics engines','var(--blue)'],['🚀 High-performance apps','var(--mint)'],['📈 Trading systems','var(--yel)']])],
+[CP,'Unreal Engine jaise major game development tools mein C++ ka important role hai.',6000,()=>`<div class="card pop" style="font-size:clamp(24px,4vw,44px);border-top:5px solid ${PU}">Unreal Engine</div><div class="code pop" style="--d:.6s;min-width:0">class AMyActor : public AActor { … };</div><div class="sub">C++ powers the engine underneath</div>`],
+[CP,'Aur naam mein jo ++ hai, woh programming ka increment operator hai — basically value ko one se increase karna.',8000,incr],
+[CP,'Matlab C ka upgraded version. Naam mein hi developer wala joke chhupa hua hai!',6000,()=>`<div class="big pop">C<span style="color:${PU}">++</span></div><div class="sub rise" style="--d:.6s">C = C + 1 → "upgraded C" 😄</div>`],
+
+[CS,'Ab baat C# ki.',4000,()=>title('C#','The Game Studio',VI)],
+[CS,'Iska naam C-sharp pronounce hota hai.',6000,()=>`<div class="big pop">C<span style="color:${VI}">#</span></div><div class="big rise" style="--d:.8s;font-size:clamp(28px,5vw,64px)">"C-sharp" 🎵</div>`],
+[CS,'Microsoft ne ise 2000 ke aas-paas introduce kiya. Ye .NET ecosystem ka important part hai.',8000,()=>timeline('~2000','Introduced by Microsoft','Part of the .NET ecosystem',VI)],
+[CS,'C# ka use desktop software, web applications, enterprise systems aur game development mein hota hai.',8000,()=>`<div class="card pop" style="border-top:5px solid ${VI}">.NET</div><div class="row">${[['🖥️ Desktop','var(--blue)'],['🌐 Web apps','var(--mint)'],['🏢 Enterprise','var(--yel)'],['🎮 Games','var(--lav)']].map((a,k)=>`<div class="card pop" style="--d:${.4+k*.4}s;background:${a[1]}">${a[0]}</div>`).join('')}</div>`],
+[CS,'Agar tum Unity mein game banana chahte ho, toh C# tumhare liye important language ho sakti hai.',10000,unity],
+[CS,'Aur ek interesting baat — C# ka naam music notation ke sharp symbol se inspired hai.',7000,()=>`<div class="cat">♯</div><div class="sub rise" style="--d:.5s">sharp = a note raised higher 🎼 — "C, but a step up"</div>`],
+[CS,'Isko C aur C++ se related family mein samajh sakte ho, lekin ye apni alag language hai.',7000,()=>`<div class="row"><div class="card pop">C</div><div class="card pop" style="--d:.3s">C++</div><div class="card pop" style="--d:.6s;border-top:5px solid ${VI}">C#<br><small>related family · its own language</small></div></div>`]
+);
+
+/* ============ ENGINE ============ */
+const $=id=>document.getElementById(id);
+let i=0,auto=false,timer=null,paused=false;
+
+function show(n){
+  i=Math.max(0,Math.min(B.length-1,n));clearTimeout(timer);
+  const b=B[i];$('scene').innerHTML=b[3]();$('strip').textContent=b[1];
+  $('tag').textContent=b[0].toUpperCase()+' · BEAT '+(i+1)+'/'+B.length;
+  $('stage').style.background=COL[b[0]]||'#fbf8f1';
+  $('prog').style.width=((i+1)/B.length*100)+'%';
+  if(auto&&!paused)timer=setTimeout(()=>{if(i<B.length-1)show(i+1)},b[2]);
+}
+const act={next:()=>show(i+1),prev:()=>show(i-1),replay:()=>show(i),
+ play(){paused=!paused;if(!paused){auto=true;$('mode').textContent='Mode: Auto'}show(i)},
+ mode(){auto=!auto;paused=false;$('mode').textContent='Mode: '+(auto?'Auto':'Manual');show(i)},
+ sec(){const s=B[i][0];show(B.findIndex(b=>b[0]==s))},
+ fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()},
+ hide(){$('ctl').classList.toggle('h')},
+ exit(){clearTimeout(timer);$('pres').style.display='none';$('home').style.display='flex';if(document.fullscreenElement)document.exitFullscreen()}};
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>act[b.dataset.a]());
+$('go').onclick=()=>{$('home').style.display='none';$('pres').style.display='flex';show(0)};
+$('hcount').textContent=B.length+' sentence-level beats ready · Manual mode is default';
+addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA'].includes(e.target.tagName)||$('pres').style.display!=='flex')return;
+  const k=e.key.toLowerCase();
+  if(k==='arrowright')act.next();else if(k==='arrowleft')act.prev();
+  else if(k===' '){e.preventDefault();paused=!paused;show(i)}
+  else if(k==='r')act.replay();else if(k==='f')act.fs();else if(k==='h')act.hide();
+});
+/* ===== STORYBOARD + SECTION NAV ===== */
+(()=>{const ctl=$('ctl'),sb=document.createElement('div');
+ sb.style.cssText='display:none;position:fixed;inset:5% 8%;background:#fff;border-radius:20px;box-shadow:0 20px 60px #0005;padding:20px;overflow:auto;z-index:9;font:14px system-ui';
+ document.body.appendChild(sb);
+ const mk=(t,f)=>{const b=document.createElement('button');b.className='btn l';b.textContent=t;b.onclick=f;ctl.insertBefore(b,ctl.firstChild);return b};
+ const secs=[...new Set(B.map(b=>b[0]))];
+ const go=d=>{const c=secs.indexOf(B[i][0]),t=secs[Math.max(0,Math.min(secs.length-1,c+d))];show(B.findIndex(b=>b[0]==t))};
+ mk('Section ⏭',()=>go(1));mk('⏮ Section',()=>go(-1));
+ mk('Restart video',()=>show(0));
+ mk('Storyboard',()=>{sb.style.display=sb.style.display=='none'?'block':'none';if(sb.style.display=='block')draw()});
+ function draw(){sb.innerHTML='<b>Storyboard</b> — click any beat <button class="btn" onclick="this.parentNode.style.display=\'none\'">Close</button>'+
+  secs.map(s=>`<h4 style="margin:14px 0 6px">${s}</h4>`+B.map((b,n)=>b[0]==s?`<button class="btn l" style="margin:2px;${n==i?'outline:2px solid #7c6cf0':''}" title="${b[1].replace(/"/g,'')}" onclick="show(${n});this.parentNode.style.display='none'">${n+1}</button>`:'').join('')).join('')}
+})();
+
+</script></body></html>
